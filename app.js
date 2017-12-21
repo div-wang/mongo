@@ -149,6 +149,7 @@ nconf.add('app', {type: 'file', file: config_app});
 // set app defaults
 var app_host = process.env.HOST || '0.0.0.0';
 var app_port = process.env.PORT || 1234;
+var app_port = process.env.PORT || 1234;
 
 // get the app configs and override if present
 if(nconf.stores.app.get('app:host') !== undefined){
@@ -282,6 +283,16 @@ async.forEachOf(connection_list, function (value, key, callback){
 },
     function (err){
         if(err) console.error(err.message);
+        
+        // 配置https服务
+        var https = require('https');
+        var credentials = {
+            "key": fs.readFileSync('../feed/ssl/div.key.unsec', 'utf8'),
+            "cert": fs.readFileSync('../feed/ssl/div.crt', 'utf8')
+        };
+        var httpsServer = https.createServer(credentials, app);
+        httpsServer.listen(app_port + 1) // 监听端口
+
         // lift the app
         app.listen(app_port, app_host, function (){
             console.log('adminMongo listening on host: http://' + app_host + ':' + app_port + app_context);
