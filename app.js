@@ -9,6 +9,7 @@ var session = require('express-session');
 var async = require('async');
 var moment = require('moment');
 var fs = require('fs');
+var config = require('./config/config');
 
 // Define routes
 var indexRoute = require('./routes/index');
@@ -286,8 +287,8 @@ async.forEachOf(connection_list, function (value, key, callback){
         // 配置https服务
         var https = require('https');
         var credentials = {
-            "key": fs.readFileSync('../feed/ssl/div.key.unsec', 'utf8'),
-            "cert": fs.readFileSync('../feed/ssl/div.crt', 'utf8')
+            "key": fs.readFileSync(config.credentials.key, 'utf8'),
+            "cert": fs.readFileSync(config.credentials.cert, 'utf8')
         };
         var httpsServer = https.createServer(credentials, app);
         httpsServer.listen(app_port + 1) // 监听端口
