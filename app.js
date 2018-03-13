@@ -9,7 +9,7 @@ var session = require('express-session');
 var async = require('async');
 var moment = require('moment');
 var fs = require('fs');
-var config = require('./config/config');
+var config = require('./config');
 
 // Define routes
 var indexRoute = require('./routes/index');
@@ -148,7 +148,7 @@ nconf.add('connections', {type: 'file', file: config_connections});
 nconf.add('app', {type: 'file', file: config_app});
 
 // set app defaults
-var app_host = process.env.HOST || '0.0.0.0';
+var app_host = process.env.HOST || '127.0.0.1';
 var app_port = process.env.PORT || 3020;
 
 // get the app configs and override if present
@@ -293,8 +293,13 @@ async.forEachOf(connection_list, function (value, key, callback){
         var httpsServer = https.createServer(credentials, app);
         httpsServer.listen(app_port + 1) // 监听端口
 
-        // lift the app
-        app.listen(app_port, app_host, function (){
+        // 配置http服务
+        var http = require('http');
+        var httpServer = http.createServer(app);
+        httpServer.listen(app_port);
+
+        // 监听http服务正确状态
+        httpServer.on('listening', function () {
             console.log('adminMongo listening on host: http://' + app_host + ':' + app_port + app_context);
 
             // used for electron to know when express app has started
@@ -309,7 +314,10 @@ async.forEachOf(connection_list, function (value, key, callback){
                     monitoring.serverMonitoring(db, app.locals.dbConnections);
                 }, 30000);
             }
-        }).on('error', function (err){
+        })
+        
+        // 监听http服务错误状态
+        httpServer.on('error', function (err){
             if(err.code === 'EADDRINUSE'){
                 console.error('Error starting adminMongo: Port ' + app_port + ' already in use, choose another');
             }else{

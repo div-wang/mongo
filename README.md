@@ -11,7 +11,7 @@ adminMongo是一个跨平台用户界面（GUI），可处理所有MongoDB连接
 ## 优化
 
 + 增加 https, 优化端口配置
-+ 优化 log，将运行 log 独立出来
++ 优化 log，将运行log 独立出来
 
 
 ## Installation

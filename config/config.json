@@ -1,7 +1,0 @@
-{
-  "connections": {},
-  "credentials": {
-    "key": "../feed/ssl/div.key.unsec",
-    "cert": "../feed/ssl/div.crt"
-  }
-}
